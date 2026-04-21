@@ -1,28 +1,32 @@
 # Binance Futures Testnet Trading Bot
 
-## What this project does
+A minimal CLI-based trading bot for Binance Futures Testnet.
 
-This is a simple Python CLI app that places orders on Binance Futures Testnet.
-
-It supports:
-
-* MARKET and LIMIT orders
-* BUY and SELL sides
-* Input validation before sending requests
-
-The focus was on correctness, validation, and clean structure rather than adding unnecessary features.
+The goal was simple: build something that **doesn't send invalid orders to the exchange**.
+Most beginner bots ignore this and fail at runtime — this one validates everything before execution.
 
 ---
 
-## How it works
+## What this actually does
 
-* `cli.py` → takes user input
-* `validators.py` → validates order using Binance rules
-* `orders.py` → places the order
-* `market.py` → fetches price and symbol info
-* `client.py` → connects to Binance API
+* Place MARKET and LIMIT orders
+* Supports BUY and SELL
+* Validates orders using real Binance rules before sending them
 
-Validation is done **before API calls** to avoid unnecessary failures.
+This project focuses on the execution layer — making sure orders are **correct and accepted**, not just sent.
+
+---
+
+## How the flow works
+
+1. `cli.py` → takes user input
+2. `validators.py` → checks order validity using exchange filters
+3. `market.py` → fetches symbol info and price
+4. `orders.py` → sends request to Binance
+5. `client.py` → handles API connection
+
+The key idea:
+👉 validation happens **before** the API call, not after failure
 
 ---
 
@@ -34,7 +38,7 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
-Create `.env`:
+Create a `.env` file:
 
 ```env
 API_KEY=your_testnet_key
@@ -42,21 +46,19 @@ API_SECRET=your_testnet_secret
 BASE_URL=https://testnet.binancefuture.com
 ```
 
-Use **Futures Testnet keys only**.
+Use **Binance Futures Testnet keys only**.
 
 ---
 
-## Usage (Commands + Output)
+## Usage
 
-### 1. Get current price
-
-**Command:**
+### Get current price
 
 ```bash
 python cli.py --symbol BTCUSDT --get_price
 ```
 
-**Output:**
+Output:
 
 ```text
 Current price of BTCUSDT: 75567.6
@@ -64,15 +66,13 @@ Current price of BTCUSDT: 75567.6
 
 ---
 
-### 2. Place MARKET order
-
-**Command:**
+### Place MARKET order
 
 ```bash
 python cli.py --symbol BTCUSDT --side BUY --type MARKET --quantity 0.005
 ```
 
-**Output:**
+Output:
 
 ```text
 ====== ORDER RESPONSE ======
@@ -89,15 +89,13 @@ Avg Price    : 75560.12
 
 ---
 
-### 3. Place LIMIT order (not immediately filled)
-
-**Command:**
+### Place LIMIT order
 
 ```bash
 python cli.py --symbol BTCUSDT --side SELL --type LIMIT --quantity 0.005 --price 90000
 ```
 
-**Output:**
+Output:
 
 ```text
 ====== ORDER RESPONSE ======
@@ -114,15 +112,13 @@ Avg Price    : 0.00
 
 ---
 
-### 4. Invalid order example (validation)
-
-**Command:**
+### Validation example (failure case)
 
 ```bash
 python cli.py --symbol BTCUSDT --side BUY --type LIMIT --quantity 0.00003 --price 20000
 ```
 
-**Output:**
+Output:
 
 ```text
 Validation/Error: Quantity too small. Min: 0.0001
@@ -132,18 +128,20 @@ Validation/Error: Quantity too small. Min: 0.0001
 
 ## Validation handled
 
-* Quantity follows LOT_SIZE (step size + min/max)
-* Price follows tick size
-* Minimum order value (MIN_NOTIONAL)
-* Basic input validation
+* LOT_SIZE → min quantity + step size
+* MIN_NOTIONAL → minimum order value
+* Basic input validation (side, type, etc.)
 
-One issue I encountered was floating-point precision while checking step size. Using `%` caused errors, so I switched to precision-based rounding.
+One issue I ran into was floating-point precision while validating step size.
+Using `%` caused valid quantities to fail.
+
+Fixed it by rounding values to the exchange precision instead of relying on raw float math.
 
 ---
 
 ## Logs
 
-Logs are saved in:
+Logs are written to:
 
 ```text
 logs/bot.log
@@ -151,26 +149,32 @@ logs/bot.log
 
 Includes:
 
-* API request payload
-* API response
-* Errors
+* request payloads
+* API responses
+* errors
 
 ---
 
 ## Notes
 
-* LIMIT orders only execute if price matches market conditions
-* MARKET orders execute instantly
-* API errors are handled and logged
+* LIMIT orders only execute if market reaches the price
+* MARKET orders execute immediately
+* API errors are caught and logged
 
 ---
 
-## What I would improve
+## What’s missing
 
-* Add order status tracking
-* Improve CLI (interactive mode)
-* Add more advanced strategies
+* No position tracking yet
+* No PnL monitoring
+* No strategy logic (manual CLI execution only)
+
+This is intentional — focus was on building a **reliable execution layer first**.
 
 ---
 
-This project focuses on building a clean, reliable base trading system with proper validation and structure.
+## Summary
+
+This is a simple but reliable trading CLI that focuses on **correctness over features**.
+
+It ensures orders follow Binance rules before hitting the API, which avoids unnecessary failures and makes the system more predictable.
