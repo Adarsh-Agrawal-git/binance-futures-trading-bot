@@ -7,9 +7,10 @@ __pycache__/
 .env
 venv/
 
-# Logs
 logs/
 *.log
+!sample_logs/
+!sample_logs/*.log
 
 # VS Code
 .vscode/

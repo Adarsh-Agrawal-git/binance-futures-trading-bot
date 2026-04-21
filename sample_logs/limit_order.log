@@ -1,0 +1,11 @@
+REQUEST: {'symbol': 'BTCUSDT', 'side': 'SELL', 'type': 'LIMIT', 'quantity': 0.005, 'price': 90000.0}
+
+RESPONSE: {
+  'orderId': 13058529819,
+  'symbol': 'BTCUSDT',
+  'status': 'NEW',
+  'type': 'LIMIT',
+  'side': 'SELL',
+  'executedQty': '0.0000',
+  'avgPrice': '0.00'
+}

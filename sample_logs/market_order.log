@@ -1,0 +1,11 @@
+REQUEST: {'symbol': 'BTCUSDT', 'side': 'BUY', 'type': 'MARKET', 'quantity': 0.005}
+
+RESPONSE: {
+  'orderId': 13058529480,
+  'symbol': 'BTCUSDT',
+  'status': 'NEW',
+  'type': 'MARKET',
+  'side': 'BUY',
+  'executedQty': '0.0000',
+  'avgPrice': '0.00'
+}
